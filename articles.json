@@ -1,17 +1,13 @@
 {
   "articles": [
     {
-      "filename": "welcome.md",
+      "articleId": "welcome_2024_01_1511",
       "status": "published",
       "metadata": {
         "title": "欢迎来到我的博客",
         "author": "Chris",
         "date": "2024-01-15",
-        "tags": [
-          "欢迎",
-          "介绍",
-          "博客"
-        ],
+        "tags": ["欢迎", "介绍", "博客"],
         "description": "欢迎来到我的个人博客！这里是我分享技术见解、生活感悟和学习心得的地方。"
       },
       "content": "# 欢迎来到我的博客\n\n欢迎来到我的个人博客！\n\n## 关于我\n\n我是Chris，一名热爱编程的开发者。我相信**生活不止眼前的苟且**，还有诗和远方的田野。\n\n(图片：pic1.jpg)\n\n## 博客功能\n\n这个博客具有以下特色功能：\n\n- 📝 支持Markdown格式写作\n- 🔍 文章审核系统\n- 📱 响应式设计\n- 💾 JSON文件存储\n\n## 技术栈\n\n本博客使用以下技术构建：\n\n- **Vue 3** - 前端框架\n- **Vite** - 构建工具\n- **CSS3** - 样式设计\n- **JSON** - 数据存储\n\n## 投稿说明\n\n欢迎大家投稿！请点击\"投稿\"按钮，填写相关信息。所有文章都需要经过管理员审核后才能发布。\n\n```javascript\n// 示例代码\nconsole.log(\"Hello, World!\");\n```\n\n期待与大家一起交流学习！\n\n## 图片插入示例\n\n在文章中插入图片非常简单，只需要使用以下语法：图片：Chris.jpg\n\n(图片：pic0.jpg)\n\n这样就可以插入一张居中显示的图片了！",
@@ -20,18 +16,13 @@
       "updatedAt": "2025-07-13T08:47:47.160Z"
     },
     {
-      "filename": "frontend-best-practices.md",
+      "articleId": "frontend_best_practices_2024",
       "status": "published",
       "metadata": {
         "title": "前端开发最佳实践",
         "author": "Chris",
         "date": "2024-01-10",
-        "tags": [
-          "前端",
-          "开发",
-          "最佳实践",
-          "JavaScript"
-        ],
+        "tags": ["前端", "开发", "最佳实践", "JavaScript"],
         "description": "在前端开发的道路上，我总结了一些最佳实践经验，希望能对大家有所帮助。"
       },
       "content": "# 前端开发最佳实践\n\n在前端开发的道路上，我总结了一些最佳实践经验，希望能对大家有所帮助。\n\n(图片：pic2.jpg)\n\n## 代码规范\n\n### 1. 命名规范\n- 使用有意义的变量名\n- 遵循驼峰命名法\n- 组件名使用PascalCase\n\n### 2. 文件组织\n- 按功能模块组织文件\n- 保持文件结构清晰\n- 合理使用文件夹分类\n\n## 性能优化\n\n### 懒加载\n对于大型应用，合理使用懒加载可以显著提升首屏加载速度：\n\n```javascript\nconst LazyComponent = () => import('./LazyComponent.vue')\n```\n\n### 代码分割\n使用动态导入实现代码分割：\n\n```javascript\n// 路由级别的代码分割\n{\n  path: '/about',\n  component: () => import('../views/About.vue')\n}\n```\n\n## 响应式设计\n\n- 移动优先的设计原则\n- 使用CSS Grid和Flexbox\n- 合理设置断点\n\n## 总结\n\n前端开发是一个不断学习和进步的过程，保持学习热情和实践精神是最重要的。",
@@ -40,18 +31,13 @@
       "updatedAt": "2025-07-13T08:49:35.950Z"
     },
     {
-      "filename": "vue3-composition-api.md",
+      "articleId": "vue3_composition_api_guide",
       "status": "published",
       "metadata": {
         "title": "Vue 3 Composition API 深度解析",
         "author": "Chris",
         "date": "2024-01-05",
-        "tags": [
-          "Vue3",
-          "Composition API",
-          "JavaScript",
-          "前端框架"
-        ],
+        "tags": ["Vue3", "Composition API", "JavaScript", "前端框架"],
         "description": "Vue 3引入的Composition API为组件逻辑的组织提供了全新的方式。让我们深入了解一下。"
       },
       "content": "# Vue 3 Composition API 深度解析\n\nVue 3引入的Composition API为组件逻辑的组织提供了全新的方式。让我们深入了解一下。\n\n(图片：pic3.jpg)\n\n## 什么是Composition API\n\nComposition API是Vue 3中用于组织组件逻辑的新方式，它提供了：\n\n- 更好的逻辑复用\n- 更清晰的代码组织\n- 更好的TypeScript支持\n\n## 基本用法\n\n### setup函数\n\n```javascript\nimport { ref, computed, onMounted } from 'vue'\n\nexport default {\n  setup() {\n    // 响应式数据\n    const count = ref(0)\n    \n    // 计算属性\n    const doubleCount = computed(() => count.value * 2)\n    \n    // 方法\n    const increment = () => {\n      count.value++\n    }\n    \n    // 生命周期\n    onMounted(() => {\n      console.log('组件已挂载')\n    })\n    \n    return {\n      count,\n      doubleCount,\n      increment\n    }\n  }\n}\n```\n\n### 响应式API\n\n- **ref()** - 创建响应式引用\n- **reactive()** - 创建响应式对象\n- **computed()** - 创建计算属性\n- **watch()** - 监听响应式数据\n\n## 优势\n\n1. **逻辑复用**: 通过组合函数轻松复用逻辑\n2. **代码组织**: 相关逻辑可以组织在一起\n3. **类型推导**: 更好的TypeScript支持\n\n## 实战技巧\n\n### 自定义Hook\n\n```javascript\n// useCounter.js\nimport { ref } from 'vue'\n\nexport function useCounter(initialValue = 0) {\n  const count = ref(initialValue)\n  \n  const increment = () => count.value++\n  const decrement = () => count.value--\n  const reset = () => count.value = initialValue\n  \n  return {\n    count,\n    increment,\n    decrement,\n    reset\n  }\n}\n```\n\nComposition API让Vue 3更加灵活和强大，值得深入学习和实践。",
@@ -60,41 +46,34 @@
       "updatedAt": "2025-07-13T08:51:10.333Z"
     },
     {
-      "filename": "pending-example.md",
+      "articleId": "resources_sharing_tools_2025",
+      "status": "published",
+      "metadata": {
+        "title": "资源分享：实用工具与下载链接",
+        "author": "Chris",
+        "tags": [],
+        "description": "资源分享：必备工具与下载链接。大家好！今天我来分享一些非常实用的工具和资源，都是一些网络冲浪时常用的，希望可以分享给大家。",
+        "date": "2025-07-15"
+      },
+      "content": "# 资源分享：必备工具与下载链接\n\n大家好！今天我来分享一些非常实用的工具和资源，都是一些网络冲浪时常用的，希望可以分享给大家。如果你有其他好用的工具，欢迎留言分享！\n\n(图片：pic4.jpg)\n\n## 1. Steam++\n\nSteam++ 是一个方便的 Steam 游戏管理工具，它提供了许多额外的功能，比如下载速度优化、游戏管理甚至可以无需魔法登录Pixiv等。\n\n(链接：https://wwt.lanzoum.com/iQuXU1tt6vxa/)\n\n## 2. AstrBot\n\nAstrBot 是一款基于人工智能的机器人，它能帮助你完成多种自动化任务，支持多种插件和扩展，极大地提升了工作效率。\n\n(链接：https://docs.astrbot.app/)\n\n## 3. AnyRouter\n\nAnyRouter 是一个非常方便的Claude Core管理工具，支持多种克劳德模型，提供了一键配置和智能调优的功能，让你能够更好地体验AI辅助编程。\n\n(链接：https://anyrouter.top/)\n\n## 4. TinyTask 鼠标键盘操作录制助手\n\nTinyTask 是一款轻量级的鼠标键盘操作录制工具，可以录制你的操作并重复执行，非常适合一些重复性高的工作。\n\n(链接：http://183.66.27.14:50157/pd/2/TinyTaskv1.77.zip?signature=b0457bb9cacbb10f337824cde7e6c85bae02ff893cf54dbc8ece92d68d220f7df76953676f20894b274e6b014ef77a52)\n\n## 5. 游戏下载站\n\n如果你是游戏爱好者，这个游戏下载站是一个非常不错的选择，里面有大量的游戏资源，供你免费下载。\n\n(链接：https://koyso.to/)\n\n希望这些内容对大家有所帮助，祝你使用愉快！如果有任何问题，或者需要更多的资源，欢迎留言交流！",
+      "fullContent": "---\ntitle: \"资源分享：实用工具与下载链接\"\nauthor: \"Chris\"\ntags: []\ndescription: \"资源分享：必备工具与下载链接。大家好！今天我来分享一些非常实用的工具和资源，都是一些网络冲浪时常用的，希望可以分享给大家。\"\ndate: \"2025-07-15\"\n---\n\n# 资源分享：必备工具与下载链接\n\n大家好！今天我来分享一些非常实用的工具和资源，都是一些网络冲浪时常用的，希望可以分享给大家。如果你有其他好用的工具，欢迎留言分享！\n\n(图片：pic4.jpg)\n\n## 1. Steam++\n\nSteam++ 是一个方便的 Steam 游戏管理工具，它提供了许多额外的功能，比如下载速度优化、游戏管理甚至可以无需魔法登录Pixiv等。\n\n(链接：https://wwt.lanzoum.com/iQuXU1tt6vxa/)\n\n## 2. AstrBot\n\nAstrBot 是一款基于人工智能的机器人，它能帮助你完成多种自动化任务，支持多种插件和扩展，极大地提升了工作效率。\n\n(链接：https://docs.astrbot.app/)\n\n## 3. AnyRouter\n\nAnyRouter 是一个非常方便的Claude Core管理工具，支持多种克劳德模型，提供了一键配置和智能调优的功能，让你能够更好地体验AI辅助编程。\n\n(链接：https://anyrouter.top/)\n\n## 4. TinyTask 鼠标键盘操作录制助手\n\nTinyTask 是一款轻量级的鼠标键盘操作录制工具，可以录制你的操作并重复执行，非常适合一些重复性高的工作。\n\n(链接：http://183.66.27.14:50157/pd/2/TinyTaskv1.77.zip?signature=b0457bb9cacbb10f337824cde7e6c85bae02ff893cf54dbc8ece92d68d220f7df76953676f20894b274e6b014ef77a52)\n\n## 5. 游戏下载站\n\n如果你是游戏爱好者，这个游戏下载站是一个非常不错的选择，里面有大量的游戏资源，供你免费下载。\n\n(链接：https://koyso.to/)\n\n希望这些内容对大家有所帮助，祝你使用愉快！如果有任何问题，或者需要更多的资源，欢迎留言交流！",
+      "createdAt": "2025-07-15T05:07:39.302Z"
+    },
+    {
+      "articleId": "pending_example_article",
       "status": "pending",
       "metadata": {
         "title": "待审核文章示例",
         "author": "匿名用户",
         "date": "2024-01-20",
-        "tags": [
-          "待审核",
-          "示例"
-        ],
+        "tags": ["待审核", "示例"],
         "description": "这是一篇待审核的文章示例，正在等待管理员审核。"
       },
       "content": "# 这是一篇待审核的文章\n\n这篇文章正在等待管理员审核...\n\n## 内容概述\n\n文章的主要内容包括：\n\n- 技术分享\n- 学习心得\n- 实践经验\n\n请管理员审核后发布，谢谢！\n\n## 更多内容\n\n这里可以写更多的技术内容或个人感悟。文章支持完整的Markdown语法，包括：\n\n- 代码块\n- 图片\n- 链接\n- 表格等\n\n(图片：pic1.jpg)\n\n```javascript\n// 示例代码\nfunction example() {\n  console.log(\"这是一个示例\");\n}\n```\n\n感谢您的时间！",
       "fullContent": "---\ntitle: \"待审核文章示例\"\nauthor: \"匿名用户\"\ndate: \"2024-01-20\"\ntags: [\"待审核\", \"示例\"]\ndescription: \"这是一篇待审核的文章示例，正在等待管理员审核。\"\n---\n\n# 这是一篇待审核的文章\n\n这篇文章正在等待管理员审核...\n\n## 内容概述\n\n文章的主要内容包括：\n\n- 技术分享\n- 学习心得\n- 实践经验\n\n请管理员审核后发布，谢谢！\n\n## 更多内容\n\n这里可以写更多的技术内容或个人感悟。文章支持完整的Markdown语法，包括：\n\n- 代码块\n- 图片\n- 链接\n- 表格等\n\n(图片：pic1.jpg)\n\n```javascript\n// 示例代码\nfunction example() {\n  console.log(\"这是一个示例\");\n}\n```\n\n感谢您的时间！",
       "createdAt": "2024-01-20T10:00:00.000Z"
-    },
-    {
-      "filename": "-1752556059302.md",
-      "status": "published",
-      "metadata": {
-        "title": "资源分享：实用工具与下载链接",
-        "author": "Chris",
-        "tags": [
-          "资源分享"
-        ],
-        "description": "资源分享：必备工具与下载链接\n\n大家好！今天我来分享一些非常实用的工具和资源，都是一些网络冲浪时常用的，希望可以分享给大家。如果你有其他好用的工具，欢迎留言分享！\n\n(图片：pic4.jpg)\n\n 1. Steam++\n\nSteam++ 是一个方便的 Steam 游戏管理工具，它提供了许多额外的功能...",
-        "date": "2025-07-15",
-        "updatedDate": "2025-07-16"
-      },
-      "content": "# 资源分享：必备工具与下载链接\n\n大家好！今天我来分享一些非常实用的工具和资源，都是一些网络冲浪时常用的，希望可以分享给大家。如果你有其他好用的工具，欢迎留言分享！\n\n(图片：pic4.jpg)\n\n## 1. Steam++\n\nSteam++ 是一个方便的 Steam 游戏管理工具，它提供了许多额外的功能，比如下载速度优化、游戏管理甚至可以无需魔法登录Pixiv等。\n\n(链接：https://wwt.lanzoum.com/iQuXU1tt6vxa/)\n\n## 2. AstrBot\n\nAstrBot 是一款基于人工智能的机器人，它能帮助你完成多种自动化任务，支持多种插件和扩展，极大地提升了工作效率。\n\n(链接：https://docs.astrbot.app/)\n\n## 3. AnyRouter\n\nAnyRouter 是一个非常方便的Claude Core管理工具，支持多种克劳德模型，提供了一键配置和智能调优的功能，让你能够更好地体验AI辅助编程。\n\n(链接：https://anyrouter.top/)\n\n## 4. TinyTask 鼠标键盘操作录制助手\n\nTinyTask 是一款轻量级的鼠标键盘操作录制工具，可以录制你的操作并重复执行，非常适合一些重复性高的工作。\n\n(链接：http://183.66.27.14:50157/directlink/2/TinyTaskv1.77.zip)\n\n## 5. 游戏下载站\n\n如果你是游戏爱好者，这个游戏下载站是一个非常不错的选择，里面有大量的游戏资源，供你免费下载。\n\n(链接：https://koyso.to/)\n\n## 6. 综合视频下载\n\n数据工具视频下载器，支持从Twitter、TikTok、Instagram、OnlyFans、Facebook下载视频并直接保存到您的设备。支持合并YouTube和B站（哔哩哔哩）的音视频内容，高速下载，便捷下载。\n\n(链接：https://www.datatool.vip/)\n\n\n希望这些内容对大家有所帮助，祝你使用愉快！如果有任何问题，或者需要更多的资源，欢迎留言交流！",
-      "fullContent": "---\ntitle: \"资源分享：实用工具与下载链接\"\nauthor: \"Chris\"\ntags: [\"资源分享\"]\ndescription: \"资源分享：必备工具与下载链接\n\n大家好！今天我来分享一些非常实用的工具和资源，都是一些网络冲浪时常用的，希望可以分享给大家。如果你有其他好用的工具，欢迎留言分享！\n\n(图片：pic4.jpg)\n\n 1. Steam++\n\nSteam++ 是一个方便的 Steam 游戏管理工具，它提供了许多额外的功能...\"\ndate: \"2025-07-15\"\nupdatedDate: \"2025-07-16\"\n---\n\n# 资源分享：必备工具与下载链接\n\n大家好！今天我来分享一些非常实用的工具和资源，都是一些网络冲浪时常用的，希望可以分享给大家。如果你有其他好用的工具，欢迎留言分享！\n\n(图片：pic4.jpg)\n\n## 1. Steam++\n\nSteam++ 是一个方便的 Steam 游戏管理工具，它提供了许多额外的功能，比如下载速度优化、游戏管理甚至可以无需魔法登录Pixiv等。\n\n(链接：https://wwt.lanzoum.com/iQuXU1tt6vxa/)\n\n## 2. AstrBot\n\nAstrBot 是一款基于人工智能的机器人，它能帮助你完成多种自动化任务，支持多种插件和扩展，极大地提升了工作效率。\n\n(链接：https://docs.astrbot.app/)\n\n## 3. AnyRouter\n\nAnyRouter 是一个非常方便的Claude Core管理工具，支持多种克劳德模型，提供了一键配置和智能调优的功能，让你能够更好地体验AI辅助编程。\n\n(链接：https://anyrouter.top/)\n\n## 4. TinyTask 鼠标键盘操作录制助手\n\nTinyTask 是一款轻量级的鼠标键盘操作录制工具，可以录制你的操作并重复执行，非常适合一些重复性高的工作。\n\n(链接：http://183.66.27.14:50157/directlink/2/TinyTaskv1.77.zip)\n\n## 5. 游戏下载站\n\n如果你是游戏爱好者，这个游戏下载站是一个非常不错的选择，里面有大量的游戏资源，供你免费下载。\n\n(链接：https://koyso.to/)\n\n## 6. 综合视频下载\n\n数据工具视频下载器，支持从Twitter、TikTok、Instagram、OnlyFans、Facebook下载视频并直接保存到您的设备。支持合并YouTube和B站（哔哩哔哩）的音视频内容，高速下载，便捷下载。\n\n(链接：https://www.datatool.vip/)\n\n\n希望这些内容对大家有所帮助，祝你使用愉快！如果有任何问题，或者需要更多的资源，欢迎留言交流！",
-      "createdAt": "2025-07-15T05:07:39.302Z",
-      "updatedAt": "2025-07-16T03:09:56.564Z"
     }
   ],
-  "exportTime": "2025-07-16T03:09:58.014Z",
+  "exportTime": "2025-07-28T13:26:00.000Z",
   "version": "1.0"
 }

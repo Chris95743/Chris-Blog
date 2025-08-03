@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 音乐JSON生成器 - Music.json配置助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 文件上传区域 */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: scale(1.02);
+        }
+
+        .upload-area.processing {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.05);
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            color: #999;
+            transition: color 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+            color: #667eea;
+        }
+
+        .upload-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* 文件信息显示 */
+        .file-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .file-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 解析结果 */
+        .parse-result {
+            margin-top: 16px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .result-value {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .editable-input {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 14px;
+            min-width: 150px;
+            text-align: right;
+        }
+
+        .editable-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* JSON输出区域 */
+        .json-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', Monaco, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .json-output:empty::before {
+            content: "// 选择MP3文件后，这里将显示生成的JSON配置\n// 可以直接复制到music.json文件中";
+            color: #666;
+            font-style: italic;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.secondary {
+            background: #6c757d;
+        }
+
+        .btn.secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn.success {
+            background: #28a745;
+        }
+
+        .btn.success:hover {
+            background: #218838;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* 状态指示器 */
+        .status {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* 批量处理区域 */
+        .batch-area {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+        }
+
+        .batch-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .batch-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .batch-item:last-child {
+            border-bottom: none;
+        }
+
+        .batch-item.success {
+            background: rgba(40, 167, 69, 0.05);
+        }
+
+        .batch-item.error {
+            background: rgba(220, 53, 69, 0.05);
+        }
+
+        .batch-info {
+            flex: 1;
+        }
+
+        .batch-name {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .batch-meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .batch-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* 配置信息样式 */
+        .config-info {
+            margin: 16px 0;
+        }
+
+        .config-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+
+        .existing-songs {
+            margin-top: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .existing-song-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 0.2s ease;
+        }
+
+        .existing-song-item:last-child {
+            border-bottom: none;
+        }
+
+        .existing-song-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .song-info-compact {
+            flex: 1;
+        }
+
+        .song-title-compact {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .song-meta-compact {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .song-id {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        /* 合并摘要样式 */
+        .merge-summary {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .summary-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            flex: 1;
+            max-width: 120px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .summary-box.total {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-color: #667eea;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .summary-box.total .summary-value {
+            color: #667eea;
+        }
+
+        /* 新增歌曲区域 */
+        .new-songs-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .new-songs-section h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        /* 模态框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 20px 24px;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-body .json-output {
+            margin: 0;
+            max-height: 50vh;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                justify-content: center;
+            }
+            
+            .file-details {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 10px;
+                max-width: none;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
+            
+            .modal-footer .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* 高亮语法 */
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .json-boolean { color: #569cd6; }
+        .json-null { color: #569cd6; }
+
+        /* 动画效果 */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .processing {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* 滚动条美化 */
+        .json-output::-webkit-scrollbar,
+        .batch-list::-webkit-scrollbar,
+        .existing-songs::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .json-output::-webkit-scrollbar-track,
+        .batch-list::-webkit-scrollbar-track,
+        .existing-songs::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 3px;
+        }
+
+        .json-output::-webkit-scrollbar-thumb,
+        .batch-list::-webkit-scrollbar-thumb,
+        .existing-songs::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 3px;
+        }
+
+        .json-output::-webkit-scrollbar-thumb:hover,
+        .batch-list::-webkit-scrollbar-thumb:hover,
+        .existing-songs::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.8);
+        }
+
+        /* 连接状态指示 */
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .connection-status.checking {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <!-- 连接状态指示器 -->
+    <div class="connection-status checking" id="connectionStatus">
+        🔍 检查服务器连接...
+    </div>
+
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="header">
+            <h1>🎵 音乐JSON生成器</h1>
+            <p>为您的音乐播放器自动生成music.json配置项</p>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 现有配置显示区域 -->
+            <div class="card">
+                <h2 class="card-title">
+                    📋 当前音乐配置
+                </h2>
+                
+                <div class="btn-group">
+                    <button class="btn" id="loadConfigBtn">
+                        🔄 加载现有配置
+                    </button>
+                    <button class="btn secondary" id="refreshConfigBtn" disabled>
+                        ♻️ 刷新
+                    </button>
+                </div>
+
+                <div class="config-info" id="configInfo">
+                    <div class="config-summary" id="configSummary">
+                        点击"加载现有配置"读取music.json文件
+                    </div>
+                </div>
+
+                <!-- 现有歌曲列表 -->
+                <div class="existing-songs" id="existingSongs"></div>
+
+                <div class="status" id="configStatus"></div>
+            </div>
+
+            <!-- 文件上传区域 -->
+            <div class="card">
+                <h2 class="card-title">
+                    📁 添加新歌曲
+                </h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                        <path d="M12,17L15,14H13V11H11V14H9L12,17Z"/>
+                    </svg>
+                    <div class="upload-text">点击选择或拖拽MP3文件</div>
+                    <div class="upload-hint">支持: .mp3, .wav, .ogg, .m4a, .flac</div>
+                </div>
+
+                <input type="file" id="fileInput" class="file-input" accept=".mp3,.wav,.ogg,.m4a,.flac" multiple>
+
+                <!-- 文件信息显示 -->
+                <div class="file-info" id="fileInfo">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-details" id="fileDetails"></div>
+                </div>
+
+                <!-- 解析结果 -->
+                <div class="parse-result" id="parseResult"></div>
+
+                <!-- 状态提示 -->
+                <div class="status" id="status"></div>
+            </div>
+        </div>
+
+        <!-- 合并配置区域 -->
+        <div class="card batch-area">
+            <h2 class="card-title">
+                🔧 配置管理
+            </h2>
+            
+            <div class="merge-summary" id="mergeSummary">
+                <div class="summary-box">
+                    <div class="summary-label">现有歌曲</div>
+                    <div class="summary-value" id="existingCount">0</div>
+                </div>
+                <div class="summary-box">
+                    <div class="summary-label">新增歌曲</div>
+                    <div class="summary-value" id="newCount">0</div>
+                </div>
+                <div class="summary-box total">
+                    <div class="summary-label">总计</div>
+                    <div class="summary-value" id="totalCount">0</div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn" id="batchSelectBtn">
+                    📁 批量添加文件
+                </button>
+                <button class="btn success" id="exportCompleteBtn" disabled>
+                    💾 导出完整配置
+                </button>
+                <button class="btn secondary" id="previewBtn" disabled>
+                    👁️ 预览合并结果
+                </button>
+                <button class="btn secondary" id="clearNewBtn">
+                    🗑️ 清空新增
+                </button>
+            </div>
+
+            <!-- 新增歌曲列表 -->
+            <div class="new-songs-section" id="newSongsSection" style="display: none;">
+                <h3>🆕 新增歌曲列表</h3>
+                <div class="batch-list" id="batchList"></div>
+            </div>
+            
+            <div class="status" id="batchStatus"></div>
+        </div>
+
+        <!-- 预览弹窗 -->
+        <div class="modal-overlay" id="previewModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📋 完整配置预览</h3>
+                    <button class="modal-close" id="closePreview">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="json-output" id="previewOutput"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" id="copyPreviewBtn">📋 复制完整配置</button>
+                    <button class="btn success" id="downloadCompleteBtn">💾 下载music.json</button>
+                    <button class="btn secondary" id="closePreviewBtn">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentFiles = [];
+        let processedFiles = [];
+        let existingConfig = null;
+        let nextId = 1;
+        let serverConnected = false;
+
+        // 音频工具函数
+        const audioUtils = {
+            formatTime(seconds) {
+                if (!seconds || isNaN(seconds)) return '0:00';
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = Math.floor(seconds % 60);
+                return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+            },
+
+            formatFileSize(bytes) {
+                if (!bytes || bytes === 0) return '未知大小';
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(1024));
+                return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+            },
+
+            parseFileName(filename) {
+                const nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
+                
+                // 支持多种分隔符格式
+                const separators = [' - ', ' — ', ' – ', ' | '];
+                
+                for (const separator of separators) {
+                    const parts = nameWithoutExt.split(separator);
+                    if (parts.length >= 2) {
+                        const title = parts[0].trim();
+                        let artist = parts[1].trim();
+                        const album = parts.length > 2 ? parts[2].trim() : '';
+                        
+                        // 处理艺术家名称中的下划线，转换为 & 符号
+                        if (artist.includes('_')) {
+                            artist = artist.replace(/_/g, ' & ');
+                        }
+                        
+                        return {
+                            title,
+                            artist,
+                            album,
+                            displayName: title,
+                            fullName: nameWithoutExt
+                        };
+                    }
+                }
+                
+                // 识别中文格式：歌名（艺术家）
+                const chinesePattern = /^(.+?)[(（](.+?)[)）](.*)$/;
+                const chineseMatch = nameWithoutExt.match(chinesePattern);
+                if (chineseMatch) {
+                    let artist = chineseMatch[2].trim();
+                    
+                    // 处理艺术家名称中的下划线
+                    if (artist.includes('_')) {
+                        artist = artist.replace(/_/g, ' & ');
+                    }
+                    
+                    return {
+                        title: chineseMatch[1].trim(),
+                        artist: artist,
+                        album: chineseMatch[3] ? chineseMatch[3].trim() : '',
+                        displayName: chineseMatch[1].trim(),
+                        fullName: nameWithoutExt
+                    };
+                }
+                
+                // 默认格式
+                return {
+                    title: nameWithoutExt.trim(),
+                    artist: '未知艺术家',
+                    album: '',
+                    displayName: nameWithoutExt.trim(),
+                    fullName: nameWithoutExt
+                };
+            }
+        };
+
+        // DOM元素获取
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileDetails = document.getElementById('fileDetails');
+        const parseResult = document.getElementById('parseResult');
+        const status = document.getElementById('status');
+        const batchSelectBtn = document.getElementById('batchSelectBtn');
+        const clearNewBtn = document.getElementById('clearNewBtn');
+        const batchList = document.getElementById('batchList');
+        const batchStatus = document.getElementById('batchStatus');
+        
+        // 新增DOM元素
+        const connectionStatus = document.getElementById('connectionStatus');
+        const loadConfigBtn = document.getElementById('loadConfigBtn');
+        const refreshConfigBtn = document.getElementById('refreshConfigBtn');
+        const configInfo = document.getElementById('configInfo');
+        const configSummary = document.getElementById('configSummary');
+        const existingSongs = document.getElementById('existingSongs');
+        const configStatus = document.getElementById('configStatus');
+        const exportCompleteBtn = document.getElementById('exportCompleteBtn');
+        const previewBtn = document.getElementById('previewBtn');
+        const existingCount = document.getElementById('existingCount');
+        const newCount = document.getElementById('newCount');
+        const totalCount = document.getElementById('totalCount');
+        const newSongsSection = document.getElementById('newSongsSection');
+        const previewModal = document.getElementById('previewModal');
+        const closePreview = document.getElementById('closePreview');
+        const closePreviewBtn = document.getElementById('closePreviewBtn');
+        const previewOutput = document.getElementById('previewOutput');
+        const copyPreviewBtn = document.getElementById('copyPreviewBtn');
+        const downloadCompleteBtn = document.getElementById('downloadCompleteBtn');
+
+        // 事件监听器
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        clearNewBtn.addEventListener('click', clearNewSongs);
+        batchSelectBtn.addEventListener('click', () => {
+            fileInput.multiple = true;
+            fileInput.click();
+        });
+        
+        // 新增事件监听器
+        loadConfigBtn.addEventListener('click', loadExistingConfig);
+        refreshConfigBtn.addEventListener('click', loadExistingConfig);
+        exportCompleteBtn.addEventListener('click', exportCompleteConfig);
+        previewBtn.addEventListener('click', showPreviewModal);
+        closePreview.addEventListener('click', hidePreviewModal);
+        closePreviewBtn.addEventListener('click', hidePreviewModal);
+        copyPreviewBtn.addEventListener('click', copyPreviewToClipboard);
+        downloadCompleteBtn.addEventListener('click', downloadCompleteConfig);
+
+        // 点击模态框外部关闭
+        previewModal.addEventListener('click', (e) => {
+            if (e.target === previewModal) {
+                hidePreviewModal();
+            }
+        });
+
+        // 检查服务器连接
+        async function checkServerConnection() {
+            try {
+                updateConnectionStatus('checking', '🔍 检查服务器连接...');
+                
+                // 尝试多个可能的URL
+                const possibleUrls = [
+                    '/music/music.json',
+                    'http://localhost:5173/music/music.json',
+                    'http://127.0.0.1:5173/music/music.json'
+                ];
+                
+                for (const url of possibleUrls) {
+                    try {
+                        const response = await fetch(url, { 
+                            method: 'HEAD',
+                            mode: 'cors'
+                        });
+                        if (response.ok) {
+                            serverConnected = true;
+                            updateConnectionStatus('connected', '✅ 服务器已连接');
+                            return true;
+                        }
+                    } catch (e) {
+                        // 继续尝试下一个URL
+                        continue;
+                    }
+                }
+                
+                // 所有URL都失败
+                serverConnected = false;
+                updateConnectionStatus('disconnected', '❌ 无法连接到服务器');
+                showOfflineMode();
+                return false;
+                
+            } catch (error) {
+                serverConnected = false;
+                updateConnectionStatus('disconnected', '❌ 连接失败');
+                showOfflineMode();
+                return false;
+            }
+        }
+
+        // 更新连接状态
+        function updateConnectionStatus(status, message) {
+            connectionStatus.className = `connection-status ${status}`;
+            connectionStatus.textContent = message;
+            
+            if (status === 'connected') {
+                setTimeout(() => {
+                    connectionStatus.style.opacity = '0.7';
+                }, 2000);
+            }
+        }
+
+        // 显示离线模式说明
+        function showOfflineMode() {
+            configSummary.innerHTML = `
+                <div style="color: #856404; background: #fff3cd; padding: 12px; border-radius: 6px; margin: 12px 0;">
+                    <strong>🔶 离线模式</strong><br>
+                    无法连接到开发服务器。请确保：<br>
+                    1. 开发服务器正在运行 (npm run dev)<br>
+                    2. 通过 http://localhost:5173 访问此页面<br>
+                    3. 或者将此文件放在 public/ 目录下<br><br>
+                    <strong>当前功能：</strong>仅支持新增歌曲分析和JSON生成
+                </div>
+            `;
+            
+            loadConfigBtn.disabled = true;
+            refreshConfigBtn.disabled = true;
+        }
+
+        // 加载现有配置
+        async function loadExistingConfig() {
+            if (!serverConnected) {
+                showConfigStatus('❌ 服务器未连接，无法加载配置', 'error');
+                return;
+            }
+
+            showConfigStatus('正在读取music.json配置...', 'info');
+            loadConfigBtn.disabled = true;
+            
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`/music/music.json?t=${timestamp}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: 配置文件不存在或无法访问`);
+                }
+                
+                const config = await response.json();
+                
+                if (!config.musicList || !Array.isArray(config.musicList)) {
+                    throw new Error('配置文件格式错误：缺少musicList数组');
+                }
+                
+                existingConfig = config;
+                
+                // 计算下一个ID
+                if (config.musicList.length > 0) {
+                    const maxId = Math.max(...config.musicList.map(song => song.id || 0));
+                    nextId = maxId + 1;
+                }
+                
+                displayExistingConfig(config);
+                updateSummary();
+                refreshConfigBtn.disabled = false;
+                
+                showConfigStatus(`✅ 成功加载 ${config.musicList.length} 首现有歌曲`, 'success');
+                
+            } catch (error) {
+                showConfigStatus(`❌ 加载失败: ${error.message}`, 'error');
+                console.error('Load config error:', error);
+            } finally {
+                loadConfigBtn.disabled = false;
+            }
+        }
+
+        // 显示现有配置
+        function displayExistingConfig(config) {
+            configSummary.innerHTML = `
+                <strong>当前配置信息</strong><br>
+                版本: ${config.config?.version || '未知'} | 
+                更新时间: ${config.config?.lastUpdated || '未知'} | 
+                歌曲总数: ${config.musicList.length}
+            `;
+            
+            if (config.musicList.length === 0) {
+                existingSongs.innerHTML = '<div class="config-summary">暂无歌曲配置</div>';
+                return;
+            }
+            
+            existingSongs.innerHTML = config.musicList.map(song => `
+                <div class="existing-song-item">
+                    <div class="song-info-compact">
+                        <div class="song-title-compact">${song.title}</div>
+                        <div class="song-meta-compact">${song.artist} • ${song.duration || '未知时长'} • ${song.size || '未知大小'}</div>
+                    </div>
+                    <div class="song-id">${song.id}</div>
+                </div>
+            `).join('');
+        }
+
+        // 拖拽处理
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            processFiles(files);
+        }
+
+        // 文件选择处理
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        // 处理文件
+        async function processFiles(files) {
+            const audioFiles = files.filter(file => 
+                /\.(mp3|wav|ogg|m4a|flac)$/i.test(file.name)
+            );
+
+            if (audioFiles.length === 0) {
+                showStatus('请选择有效的音频文件', 'error');
+                return;
+            }
+
+            if (audioFiles.length === 1) {
+                await processSingleFile(audioFiles[0]);
+            } else {
+                await processBatchFiles(audioFiles);
+            }
+        }
+
+        // 单文件处理
+        async function processSingleFile(file) {
+            showStatus('正在分析文件...', 'info');
+            uploadArea.classList.add('processing');
+
+            try {
+                const fileData = await analyzeAudioFile(file);
+                displaySingleFileResult(fileData);
+                
+                processedFiles.push(fileData);
+                updateNewSongsList();
+                updateSummary();
+                
+                showStatus('文件分析完成！', 'success');
+            } catch (error) {
+                showStatus(`分析失败: ${error.message}`, 'error');
+                console.error('File analysis error:', error);
+            } finally {
+                uploadArea.classList.remove('processing');
+            }
+        }
+
+        // 批量文件处理
+        async function processBatchFiles(files) {
+            showBatchStatus(`正在处理 ${files.length} 个文件...`, 'info');
+            newSongsSection.style.display = 'block';
+            batchList.innerHTML = '';
+            
+            const results = [];
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const batchItem = createBatchItem(file.name, '处理中...');
+                batchList.appendChild(batchItem);
+                
+                try {
+                    const fileData = await analyzeAudioFile(file);
+                    results.push(fileData);
+                    
+                    updateBatchItem(batchItem, fileData, 'success');
+                    showBatchStatus(`已处理 ${i + 1}/${files.length} 个文件`, 'info');
+                } catch (error) {
+                    updateBatchItem(batchItem, { name: file.name, error: error.message }, 'error');
+                    console.error(`Error processing ${file.name}:`, error);
+                }
+            }
+            
+            processedFiles.push(...results);
+            updateSummary();
+            
+            showBatchStatus(`批量处理完成！成功处理 ${results.length}/${files.length} 个文件`, 'success');
+        }
+
+        // 分析音频文件
+        async function analyzeAudioFile(file) {
+            return new Promise((resolve, reject) => {
+                const audio = new Audio();
+                const url = URL.createObjectURL(file);
+                
+                const timeout = setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                    reject(new Error('分析超时'));
+                }, 10000);
+                
+                audio.addEventListener('loadedmetadata', () => {
+                    clearTimeout(timeout);
+                    
+                    const parsed = audioUtils.parseFileName(file.name);
+                    const fileData = {
+                        id: nextId++,
+                        title: parsed.title,
+                        artist: parsed.artist,
+                        album: parsed.album || '未知专辑',
+                        filename: file.name,
+                        url: `/music/${file.name}`,
+                        duration: audioUtils.formatTime(audio.duration),
+                        size: audioUtils.formatFileSize(file.size),
+                        fileSize: file.size,
+                        audioDuration: audio.duration,
+                        displayName: parsed.displayName
+                    };
+                    
+                    URL.revokeObjectURL(url);
+                    resolve(fileData);
+                });
+                
+                audio.addEventListener('error', () => {
+                    clearTimeout(timeout);
+                    URL.revokeObjectURL(url);
+                    reject(new Error('无法读取音频文件'));
+                });
+                
+                audio.src = url;
+            });
+        }
+
+        // 显示单文件结果
+        function displaySingleFileResult(fileData) {
+            fileInfo.classList.add('show');
+            fileName.textContent = fileData.filename;
+            
+            fileDetails.innerHTML = `
+                <div>文件大小: ${fileData.size}</div>
+                <div>音频时长: ${fileData.duration}</div>
+            `;
+
+            parseResult.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">歌曲标题:</span>
+                    <input type="text" class="editable-input" value="${fileData.title}" 
+                           onchange="updateField(${fileData.id}, 'title', this.value)">
+                </div>
+                <div class="result-item">
+                    <span class="result-label">艺术家:</span>
+                    <input type="text" class="editable-input" value="${fileData.artist}"
+                           onchange="updateField(${fileData.id}, 'artist', this.value)">
+                </div>
+                <div class="result-item">
+                    <span class="result-label">专辑:</span>
+                    <input type="text" class="editable-input" value="${fileData.album}"
+                           onchange="updateField(${fileData.id}, 'album', this.value)">
+                </div>
+                <div class="result-item">
+                    <span class="result-label">时长:</span>
+                    <span class="result-value">${fileData.duration}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">文件大小:</span>
+                    <span class="result-value">${fileData.size}</span>
+                </div>
+            `;
+
+            currentFiles = [fileData];
+        }
+
+        // 更新字段值
+        function updateField(songId, field, value) {
+            const song = processedFiles.find(s => s.id === songId);
+            if (song) {
+                song[field] = value;
+                updateNewSongsList();
+            }
+        }
+
+        // 更新新增歌曲列表
+        function updateNewSongsList() {
+            if (processedFiles.length === 0) {
+                newSongsSection.style.display = 'none';
+                return;
+            }
+            
+            newSongsSection.style.display = 'block';
+            batchList.innerHTML = processedFiles.map(song => `
+                <div class="batch-item success">
+                    <div class="batch-info">
+                        <div class="batch-name">${song.title} - ${song.artist}</div>
+                        <div class="batch-meta">${song.duration} • ${song.size} • ID: ${song.id}</div>
+                    </div>
+                    <button class="btn secondary" onclick="removeSong(${song.id})" style="padding: 4px 8px; font-size: 12px;">
+                        🗑️ 移除
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // 移除歌曲
+        function removeSong(songId) {
+            processedFiles = processedFiles.filter(song => song.id !== songId);
+            updateNewSongsList();
+            updateSummary();
+        }
+
+        // 更新摘要
+        function updateSummary() {
+            const existingTotal = existingConfig ? existingConfig.musicList.length : 0;
+            const newTotal = processedFiles.length;
+            const total = existingTotal + newTotal;
+            
+            existingCount.textContent = existingTotal;
+            newCount.textContent = newTotal;
+            totalCount.textContent = total;
+            
+            exportCompleteBtn.disabled = total === 0;
+            previewBtn.disabled = total === 0;
+        }
+
+        // 生成完整配置
+        function generateCompleteConfig() {
+            const existingSongs = existingConfig ? existingConfig.musicList : [];
+            const allSongs = [...existingSongs, ...processedFiles];
+            
+            return {
+                musicList: allSongs.map(song => ({
+                    id: song.id,
+                    title: song.title,
+                    artist: song.artist,
+                    album: song.album,
+                    filename: song.filename,
+                    url: song.url,
+                    duration: song.duration,
+                    size: song.size
+                })),
+                config: {
+                    version: "1.0",
+                    lastUpdated: new Date().toISOString().split('T')[0],
+                    description: "音乐播放器配置文件 - 包含现有和新增歌曲",
+                    totalSongs: allSongs.length
+                }
+            };
+        }
+
+        // 导出完整配置
+        function exportCompleteConfig() {
+            try {
+                const completeConfig = generateCompleteConfig();
+                const jsonText = JSON.stringify(completeConfig, null, 2);
+                const blob = new Blob([jsonText], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `music.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showBatchStatus('完整music.json配置文件已下载！可直接替换现有配置', 'success');
+            } catch (error) {
+                showBatchStatus('导出失败: ' + error.message, 'error');
+            }
+        }
+
+        // 显示预览模态框
+        function showPreviewModal() {
+            const completeConfig = generateCompleteConfig();
+            previewOutput.innerHTML = syntaxHighlight(JSON.stringify(completeConfig, null, 2));
+            previewModal.style.display = 'flex';
+        }
+
+        // 隐藏预览模态框
+        function hidePreviewModal() {
+            previewModal.style.display = 'none';
+        }
+
+        // 复制预览内容
+        async function copyPreviewToClipboard() {
+            try {
+                const jsonText = previewOutput.textContent;
+                await navigator.clipboard.writeText(jsonText);
+                showBatchStatus('完整配置已复制到剪贴板！', 'success');
+            } catch (error) {
+                showBatchStatus('复制失败，请手动复制', 'error');
+            }
+        }
+
+        // 下载完整配置
+        function downloadCompleteConfig() {
+            exportCompleteConfig();
+            hidePreviewModal();
+        }
+
+        // 创建批量项目
+        function createBatchItem(filename, status) {
+            const div = document.createElement('div');
+            div.className = 'batch-item';
+            div.innerHTML = `
+                <div class="batch-info">
+                    <div class="batch-name">${filename}</div>
+                    <div class="batch-meta">正在分析...</div>
+                </div>
+                <div class="batch-status">${status}</div>
+            `;
+            return div;
+        }
+
+        // 更新批量项目
+        function updateBatchItem(item, data, status) {
+            const info = item.querySelector('.batch-info');
+            const statusEl = item.querySelector('.batch-status');
+            
+            if (status === 'success') {
+                item.classList.add('success');
+                info.innerHTML = `
+                    <div class="batch-name">${data.title} - ${data.artist}</div>
+                    <div class="batch-meta">${data.duration} • ${data.size} • ID: ${data.id}</div>
+                `;
+                statusEl.textContent = '✅ 成功';
+                statusEl.style.background = '#d4edda';
+                statusEl.style.color = '#155724';
+            } else if (status === 'error') {
+                item.classList.add('error');
+                info.innerHTML = `
+                    <div class="batch-name">${data.name}</div>
+                    <div class="batch-meta">错误: ${data.error}</div>
+                `;
+                statusEl.textContent = '❌ 失败';
+                statusEl.style.background = '#f8d7da';
+                statusEl.style.color = '#721c24';
+            }
+        }
+
+        // JSON语法高亮
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        // 清空新增歌曲
+        function clearNewSongs() {
+            processedFiles = [];
+            currentFiles = [];
+            fileInfo.classList.remove('show');
+            parseResult.innerHTML = '';
+            status.classList.remove('show');
+            fileInput.value = '';
+            updateNewSongsList();
+            updateSummary();
+            newSongsSection.style.display = 'none';
+        }
+
+        // 显示状态
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = `status show ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    status.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // 显示配置状态
+        function showConfigStatus(message, type) {
+            configStatus.textContent = message;
+            configStatus.className = `status show ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    configStatus.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // 显示批量状态
+        function showBatchStatus(message, type) {
+            batchStatus.textContent = message;
+            batchStatus.className = `status show ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    batchStatus.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🎵 音乐JSON生成器已就绪');
+            
+            // 检查服务器连接
+            const connected = await checkServerConnection();
+            
+            // 如果连接成功，自动加载配置
+            if (connected) {
+                setTimeout(() => {
+                    loadExistingConfig();
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
